@@ -1,0 +1,21 @@
+insert into TimeEntryDB.dbo.DimClientEngagements
+(
+ [ClientID]
+,[ClientName]
+,[EngagementID]
+,[EngagementName]
+,[Region]
+,[EngagementStatus]
+,[Client_Engagement])
+values
+
+('11423744','Hospital 1','E-123','SOW 1','US - Central','Released','Hospital 1 - SOW 1')
+,('11423744','Hospital 1','E-124','SOW 2','US - Central','Released','Hospital 1 - SOW 2')
+,('11423744','Hospital 1','E-125','SOW 3','US - Central','Released','Hospital 1 - SOW 3')
+,('11423744','Hospital 2','E-126','SOW 1','US - Central','Released','Hospital 2 - SOW 1')
+,('11423744','Hospital 2','E-127','SOW 2','US - Central','Released','Hospital 2 - SOW 2')
+,('11423744','Hospital 3','E-128','SOW 1','Central','Closed','Hospital 3 - SOW 1')
+,('11423744','Hospital 3','E-129','SOW 2','US - Central','Released','Hospital 3 - SOW 2')
+,('11423744','Hospital 3','E-130','SOW 3','US - Central','Released','Hospital 3 - SOW 3')
+,('11423744','Hospital 3','E-131','SOW 4','US - Central','Released','Hospital 3 - SOW 4')
+,('11423744','Hospital 3','E-132','SOW 5','US - Central','Completed','Hospital 3 - SOW 5')
