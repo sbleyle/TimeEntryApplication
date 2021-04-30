@@ -88,14 +88,6 @@ def engagement_dropdown(client = None):
         data.append(engagement_list[0])
     return data
 
-def engagementcode_dropdown(client = None, engagement = None):
-    cur = conn.cursor()
-    cur.execute("SELECT [EngagementID] FROM TimeEntryDB.dbo.DimClientEngagements WHERE [ClientName] = ? AND [EngagementName] = ?", client, engagement)
-    data = []
-    for engagementcode_list in cur.fetchall():
-        data.append(engagementcode_list[0])
-    return data
-
 def payperiod_dropdown():
     cur = conn.cursor()
     cur.execute("SELECT dpp.[PayPeriod] FROM TimeEntryDB.dbo.DimPayPeriod dpp WITH (NOLOCK) LEFT JOIN TimeEntryDB.dbo.Timesheet_Entries te ON dpp.[PayPeriod] = te.[PayPeriod] WHERE te.[Status] IN('Not Submitted', 'Rejected') OR (GETDATE() + DAY(14) >= dpp.[Date] AND te.[Status] IS NULL) GROUP BY dpp.[PayPeriod] ORDER BY max(dpp.[Date]) DESC")
@@ -624,69 +616,3 @@ def week2_total(os_username):
 	for hours_list in cur.fetchall():
 		data.append(hours_list[0])
 	return data
-
-def week1_by_client_hours(os_username):
-	cur = conn.cursor()
-	cur.execute("""
-		SELECT
-
-			COALESCE(te.[Client], 'Total') AS [Client]
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Monday' THEN [HoursWorked] ELSE 0 END) AS 'Monday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Tuesday' THEN [HoursWorked] ELSE 0 END) AS 'Tuesday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Wednesday' THEN [HoursWorked] ELSE 0 END) AS 'Wednesday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Thursday' THEN [HoursWorked] ELSE 0 END) AS 'Thursday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Friday' THEN [HoursWorked] ELSE 0 END) AS 'Friday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Saturday' THEN [HoursWorked] ELSE 0 END) AS 'Saturday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Sunday' THEN [HoursWorked] ELSE 0 END) AS 'Sunday'
-			,SUM([HoursWorked]) AS [Total]
-
-		FROM Timesheet_Entries te
-		LEFT JOIN DimPayPeriod dpp ON dpp.[Date] = te.[WorkDate]
-		WHERE dpp.[WeekNumber] = 1 AND GETDATE() >= dateadd(d, -7, [Week1Date]) AND GETDATE() <= [Week2Date] AND te.[Username] = ?
-		GROUP BY ROLLUP(te.[Client])""", os_username)
-	rows = cur.fetchall()
-	return rows
-
-def week2_by_client_hours(os_username):
-	cur = conn.cursor()
-	cur.execute("""
-		SELECT
-
-			COALESCE(te.[Client], 'Total') AS [Client]
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Monday' THEN [HoursWorked] ELSE 0 END) AS 'Monday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Tuesday' THEN [HoursWorked] ELSE 0 END) AS 'Tuesday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Wednesday' THEN [HoursWorked] ELSE 0 END) AS 'Wednesday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Thursday' THEN [HoursWorked] ELSE 0 END) AS 'Thursday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Friday' THEN [HoursWorked] ELSE 0 END) AS 'Friday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Saturday' THEN [HoursWorked] ELSE 0 END) AS 'Saturday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 2 AND dpp.[Weekday] = 'Sunday' THEN [HoursWorked] ELSE 0 END) AS 'Sunday'
-			,SUM([HoursWorked]) AS [Total]
-
-		FROM Timesheet_Entries te
-		LEFT JOIN DimPayPeriod dpp ON dpp.[Date] = te.[WorkDate]
-		WHERE dpp.[WeekNumber] = 2 AND GETDATE() >= dateadd(d, -7, [Week1Date]) AND GETDATE() <= [Week2Date] AND te.[Username] = ?
-		GROUP BY ROLLUP(te.[Client])""", os_username)
-	rows = cur.fetchall()
-	return rows
-
-def weeks_combined(os_username):
-	cur = conn.cursor()
-	cur.execute("""
-		SELECT
-
-			COALESCE(dpp.[Week], 'Total') AS [Week]
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Monday' THEN [HoursWorked] ELSE 0 END) AS 'Monday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Tuesday' THEN [HoursWorked] ELSE 0 END) AS 'Tuesday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Wednesday' THEN [HoursWorked] ELSE 0 END) AS 'Wednesday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Thursday' THEN [HoursWorked] ELSE 0 END) AS 'Thursday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Friday' THEN [HoursWorked] ELSE 0 END) AS 'Friday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Saturday' THEN [HoursWorked] ELSE 0 END) AS 'Saturday'
-			,SUM(CASE WHEN dpp.[WeekNumber] = 1 AND dpp.[Weekday] = 'Sunday' THEN [HoursWorked] ELSE 0 END) AS 'Sunday'
-			,SUM([HoursWorked]) AS [Total]
-
-		FROM Timesheet_Entries te
-		LEFT JOIN DimPayPeriod dpp ON dpp.[Date] = te.[WorkDate]
-		WHERE GETDATE() >= dateadd(d, -7, [Week1Date]) AND GETDATE() <= [Week2Date]
-		GROUP BY ROLLUP(dpp.[Week])""")
-	rows = cur.fetchall()
-	return rows
