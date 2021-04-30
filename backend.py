@@ -11,7 +11,7 @@ global os_username
 
 conn = pyodbc.connect(
     Driver = '{ODBC Driver 17 for SQL Server}',
-    Server = '',
+    Server = 'us1261960w1\sqlexpress',
     Database = 'TimeEntryDB',
     Trusted_Connection = 'Yes',
     uid = 'TimeEntryApplication',
